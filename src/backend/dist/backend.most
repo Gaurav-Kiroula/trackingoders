@@ -1,0 +1,101 @@
+// Version: 1.0.0
+type Data__791452850<K, V> =
+  {var count : Nat__490723111; kvs : [var ?(K, V)]};
+type DriverId__1019565535 = Nat;
+type DriverInternal__978632493 =
+  {
+    var assignedVehicleId : ?VehicleId__963797663;
+    id : DriverId__1019565535;
+    var isActive : Bool;
+    name : Text;
+    phone : Text;
+    principalId : ?Principal
+  };
+type GpsCoordinates__971911444 =
+  {capturedAt : Timestamp__301639476; lat : Float; lng : Float};
+type Internal__8484328<K, V> =
+  {children : [var ?Node__46230540<K, V>]; data : Data__791452850<K, V>};
+type Leaf__809889148<K, V> = {data : Data__791452850<K, V>};
+type List__415060402<T> = List__790383201<T>;
+type List__790383201<T> =
+  {
+    var blockIndex : Nat__490723111;
+    var blocks : [var [var ?T]];
+    var elementIndex : Nat__490723111
+  };
+type Map__158565046<K, V> = Map__297112838<K, V>;
+type Map__297112838<K, V> =
+  {var root : Node__46230540<K, V>; var size : Nat__490723111};
+type Map__605269027<K, V> = Map__158565046<K, V>;
+type Nat__490723111 = Nat__920180692;
+type Nat__920180692 = Nat;
+type Node__46230540<K, V> =
+  {#internal : Internal__8484328<K, V>; #leaf : Leaf__809889148<K, V>};
+type ShipmentId__581178527 = Nat;
+type ShipmentInternal__9470877 =
+  {
+    var assignedDriverId : ?DriverId__1019565535;
+    var assignedVehicleId : ?VehicleId__963797663;
+    createdAt : Timestamp__301639476;
+    var currentStatus : ShipmentStatus__920686463;
+    customerName : Text;
+    customerPhone : Text;
+    deliveryAddress : Text;
+    id : ShipmentId__581178527;
+    itemDescription : Text;
+    var lastGps : ?GpsCoordinates__971911444;
+    pickupAddress : Text;
+    statusHistory : List__415060402<StatusEvent__867957812>;
+    trackingCode : TrackingCode__942304644;
+    weightKg : Float
+  };
+type ShipmentStatus__920686463 =
+  {#assigned; #delivered; #failed; #inTransit; #pending; #pickedUp};
+type StaffProfile__442645431 =
+  {name : Text; principalId : Principal; role : StaffRole__334678748};
+type StaffRole__334678748 = {#admin; #dispatcher; #driver};
+type StatusEvent__867957812 =
+  {
+    note : ?Text;
+    staffOnly : Bool;
+    status : ShipmentStatus__920686463;
+    timestamp : Timestamp__301639476
+  };
+type Timestamp__301639476 = Int;
+type TrackingCode__942304644 = Text;
+type UserRole__1054455867 = {#admin; #guest; #user};
+type VehicleId__963797663 = Nat;
+type VehicleInternal__573318479 =
+  {
+    capacityKg : Float;
+    id : VehicleId__963797663;
+    licensePlate : Text;
+    var status : VehicleStatus__502841457
+  };
+type VehicleStatus__502841457 = {#available; #inUse; #maintenance};
+actor {
+  stable accessControlState :
+    {
+      var adminAssigned : Bool;
+      userRoles : Map__605269027<Principal, UserRole__1054455867>
+    };
+  stable driverState :
+    {
+      drivers :
+        Map__605269027<DriverId__1019565535, DriverInternal__978632493>;
+      var nextDriverId : DriverId__1019565535;
+      var nextVehicleId : VehicleId__963797663;
+      vehicles :
+        Map__605269027<VehicleId__963797663, VehicleInternal__573318479>
+    };
+  stable shipmentState :
+    {
+      var nextId : ShipmentId__581178527;
+      shipments :
+        Map__605269027<ShipmentId__581178527, ShipmentInternal__9470877>;
+      trackingIndex :
+        Map__605269027<TrackingCode__942304644, ShipmentId__581178527>
+    };
+  stable staffState :
+    {profiles : Map__605269027<Principal, StaffProfile__442645431>}
+};

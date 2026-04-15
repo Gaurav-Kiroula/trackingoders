@@ -1,0 +1,141 @@
+type VehicleStatus = 
+ variant {
+   available;
+   inUse;
+   maintenance;
+ };
+type VehicleId = nat;
+type Vehicle = 
+ record {
+   capacityKg: float64;
+   id: VehicleId;
+   licensePlate: text;
+   status: VehicleStatus;
+ };
+type UserRole = 
+ variant {
+   admin;
+   guest;
+   user;
+ };
+type UpdateStatusRequest = 
+ record {
+   gps: opt GpsCoordinates;
+   note: opt text;
+   shipmentId: ShipmentId;
+   staffOnly: bool;
+   status: ShipmentStatus;
+ };
+type TrackingCode = text;
+type Timestamp = int;
+type StatusEvent = 
+ record {
+   note: opt text;
+   staffOnly: bool;
+   status: ShipmentStatus;
+   timestamp: Timestamp;
+ };
+type StaffRole = 
+ variant {
+   admin;
+   dispatcher;
+   driver;
+ };
+type StaffProfile = 
+ record {
+   name: text;
+   principalId: principal;
+   role: StaffRole;
+ };
+type ShipmentStatus = 
+ variant {
+   assigned;
+   delivered;
+   failed;
+   inTransit;
+   pending;
+   pickedUp;
+ };
+type ShipmentId = nat;
+type Shipment = 
+ record {
+   assignedDriverId: opt DriverId;
+   assignedVehicleId: opt VehicleId;
+   createdAt: Timestamp;
+   currentStatus: ShipmentStatus;
+   customerName: text;
+   customerPhone: text;
+   deliveryAddress: text;
+   id: ShipmentId;
+   itemDescription: text;
+   lastGps: opt GpsCoordinates;
+   pickupAddress: text;
+   statusHistory: vec StatusEvent;
+   trackingCode: TrackingCode;
+   weightKg: float64;
+ };
+type GpsCoordinates = 
+ record {
+   capturedAt: Timestamp;
+   lat: float64;
+   lng: float64;
+ };
+type DriverId = nat;
+type Driver = 
+ record {
+   assignedVehicleId: opt VehicleId;
+   id: DriverId;
+   isActive: bool;
+   name: text;
+   phone: text;
+   principalId: opt principal;
+ };
+type CreateVehicleRequest = 
+ record {
+   capacityKg: float64;
+   licensePlate: text;
+ };
+type CreateShipmentRequest = 
+ record {
+   customerName: text;
+   customerPhone: text;
+   deliveryAddress: text;
+   itemDescription: text;
+   pickupAddress: text;
+   weightKg: float64;
+ };
+type CreateDriverRequest = 
+ record {
+   assignedVehicleId: opt VehicleId;
+   name: text;
+   phone: text;
+   principalId: opt principal;
+ };
+service : {
+  _initializeAccessControl: () -> ();
+  addShipmentNote: (shipmentId: ShipmentId, note: text, staffOnly: bool) ->
+   ();
+  assignCallerUserRole: (user: principal, role: UserRole) -> ();
+  assignDriverToShipment: (shipmentId: ShipmentId, driverId: DriverId,
+   vehicleId: opt VehicleId) -> ();
+  createDriver: (req: CreateDriverRequest) -> (Driver);
+  createVehicle: (req: CreateVehicleRequest) -> (Vehicle);
+  deactivateDriver: (id: DriverId) -> ();
+  getCallerUserProfile: () -> (opt StaffProfile) query;
+  getCallerUserRole: () -> (UserRole) query;
+  getDriver: (id: DriverId) -> (opt Driver) query;
+  getShipment: (id: ShipmentId) -> (opt Shipment) query;
+  getUserProfile: (user: principal) -> (opt StaffProfile) query;
+  isCallerAdmin: () -> (bool) query;
+  listAllShipments: () -> (vec Shipment) query;
+  listDrivers: () -> (vec Driver) query;
+  listStaffProfiles: () -> (vec StaffProfile) query;
+  listVehicles: () -> (vec Vehicle) query;
+  pushGpsUpdate: (shipmentId: ShipmentId, coords: GpsCoordinates) -> ();
+  saveCallerUserProfile: (profile: StaffProfile) -> ();
+  submitOrder: (req: CreateShipmentRequest) -> (Shipment);
+  trackShipment: (trackingCode: TrackingCode) -> (opt Shipment) query;
+  updateDriver: (id: DriverId, req: CreateDriverRequest) -> ();
+  updateShipmentStatus: (req: UpdateStatusRequest) -> ();
+  updateVehicleStatus: (id: VehicleId, status: VehicleStatus) -> ();
+}
