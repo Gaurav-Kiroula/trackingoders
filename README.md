@@ -1,4 +1,4 @@
-verview
+preview
 
 Enterprise goods transportation management platform with protected staff dashboard, anonymous customer order submission with tracking codes, and GPS-based live shipment tracking with static map display.
 
